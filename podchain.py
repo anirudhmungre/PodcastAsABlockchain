@@ -2,7 +2,7 @@ from time import time
 from json import dumps
 from hashlib import sha256
 
-class Blockchain(object):
+class PodChain(object):
     def __init__(self):
         """
         Initializes the blockchain
