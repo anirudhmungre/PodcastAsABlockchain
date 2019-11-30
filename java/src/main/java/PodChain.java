@@ -5,14 +5,13 @@ import java.util.ArrayList;
 public class PodChain {
 
     public static ArrayList<Block> blockchain = new ArrayList<Block>();
-    public static int difficulty = 5;
+    public static int difficulty = 6;
 
     public static Boolean isChainValid() {
         Block currentBlock;
         Block previousBlock;
         String hashTarget = new String(new char[difficulty]).replace('\0', '0');
-
-        //loop through blockchain to check hashes:
+        // Loop through blockchain to check hashes:
         for(int i = 1; i < blockchain.size(); i++) {
             currentBlock = blockchain.get(i);
             previousBlock = blockchain.get(i-1);
@@ -21,12 +20,12 @@ public class PodChain {
                 System.out.println("Current hash is incorrect.");
                 return false;
             }
-            //compare previous hash and registered previous hash
+            // Compare previous hash and registered previous hash
             if(!previousBlock.hash.equals(currentBlock.previousHash) ) {
                 System.out.println("Previous Hash does not match previous block hash.");
                 return false;
             }
-            //check if hash is solved
+            // Check if hash is solved
             if(!currentBlock.hash.substring( 0, difficulty).equals(hashTarget)) {
                 System.out.println("This block hasn't been mined");
                 return false;
