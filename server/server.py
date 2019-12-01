@@ -17,6 +17,10 @@ elif len(argv) > 2:
 # Initialize Flask Object
 app = Flask(__name__)
 
+# -------------------------------------------------
+#  EVERYTHING BELOW UNTIL MARKER IS FOR BLOCKCHAIN
+# -------------------------------------------------
+
 # Generate a unique id for this server node
 node_identifier = str(uuid4()).replace('-', '')
 
@@ -122,6 +126,9 @@ def consensus():
         }
 
     return jsonify(resp), 200
+# -------------------------------------------------
+#  EVERYTHING ABOVE UNTIL MARKER IS FOR BLOCKCHAIN
+# -------------------------------------------------
 
 if __name__ == '__main__':
     print(f'Starting server on port {argv[1]}')
