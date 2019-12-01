@@ -34,6 +34,7 @@ def mine():
     proof = podchain.proof_of_work(last_proof)
 
     # Send reward based on proof
+    # TODO: SEND REWARD BASED ON NUMBER OF TRANSACTIONS
     podchain.new_transaction("0", node_identifier, 1)
 
     # Add new block to the podchain!
@@ -45,7 +46,7 @@ def mine():
         'index': block['index'],
         'transactions': block['transactions'],
         'proof': block['proof'],
-        'previous_hash': block['previous_hash'],
+        'previous_hash': block['previous_hash']
     }
 
     return jsonify(resp), 200
@@ -65,8 +66,51 @@ def new_transaction():
     # Add a new Transaction
     index = podchain.new_transaction(data['sender'], data['recipient'], data['amount'])
 
-    resp = {'message': f'Transaction added at index: {index}'}
+    resp = {
+        'message': f'Transaction added at index: {index}'
+    }
     return jsonify(resp), 201
+
+@app.route('/nodes/add', methods=['POST'])
+def add_node():
+    """
+    Adds a node to the distributed system by making local nodes aware of all other node addresses
+    """
+    data = request.get_json()
+    # Retrieve the new list of given nodes
+    nodes = data.get('nodes')
+    if nodes is None:
+        return "Invalid or empty list of nodes", 400
+    # Loop through all given nodes and add each to node set
+    for node in nodes:
+        podchain.add_node(node)
+
+    resp = {
+        'message': 'Successfully added new nodes',
+        'total_nodes': list(podchain.nodes),
+    }
+    return jsonify(resp), 201
+
+@app.route('/nodes/consensus', methods=['GET'])
+def consensus():
+    """
+    Requests the blockchain to achieve consensus within nodes
+    """
+    # New chain is a boolean that says whether a new chain was adopted or not
+    new_chain = podchain.achieve_consensus()
+
+    if new_chain:
+        resp = {
+            'message': 'The local chain was replaced',
+            'new_chain': podchain.chain
+        }
+    else:
+        resp = {
+            'message': 'The local chain is the leader',
+            'chain': podchain.chain
+        }
+
+    return jsonify(resp), 200
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
