@@ -1,7 +1,18 @@
+from sys import argv, exit
 from podchain import PodChain
 
 from flask import Flask, jsonify, request
 from uuid import uuid4
+
+# Make sure user is using correct number of args
+if len(argv) < 2:
+    print("ERROR: Not enough args")
+    print("USAGE: python server.py <port>")
+    exit(0)
+elif len(argv) > 2:
+    print("ERROR: Too many enough args")
+    print("USAGE: python server.py <port>")
+    exit(0)
 
 # Initialize Flask Object
 app = Flask(__name__)
@@ -113,4 +124,5 @@ def consensus():
     return jsonify(resp), 200
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    print(f'Starting server on port {argv[1]}')
+    app.run(port=argv[1], debug=True)

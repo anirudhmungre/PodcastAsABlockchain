@@ -1,7 +1,7 @@
 from time import time
 from json import dumps
 from hashlib import sha256
-from urlib.parse import urlparse
+from urllib.parse import urlparse
 from requests import get
 
 class PodChain(object):
