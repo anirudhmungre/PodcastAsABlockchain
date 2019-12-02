@@ -41,7 +41,7 @@ class SQL(object):
         rows = None
         sql = None
         if id is None:
-            sql = f'SELECT id, title, posterKey, date FROM {tablename} ORDER BY date DESC'
+            sql = f'SELECT id, title, media, posterKey, date FROM {tablename} ORDER BY date DESC'
         else:
             sql = f'SELECT media FROM {tablename} WHERE id=\'{id}\''
 

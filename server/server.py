@@ -166,9 +166,10 @@ def podcasts():
     resp = [{
             'id': id,
             'title': title,
+            'media': media,
             'posterKey': posterKey,
             'date': date
-        } for id, title, posterKey, date in sql.select('Podcast')]
+        } for id, title, media, posterKey, date in sql.select('Podcast')]
     return jsonify(resp), 200
 
 @app.route('/podcasts/add', methods=['POST'])
