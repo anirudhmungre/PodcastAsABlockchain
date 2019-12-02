@@ -16,6 +16,22 @@
 </head>
 
 <body>
+    <h3>Upload a Podcast</h3>
+    <div id="upload" class="upload">
+        <input id="title" placeholder="Title" required>
+        <input id="pubKey" placeholder="PodCoin Wallet Public Key" required>
+        <div class="file-field input-field">
+            <div class="btn purple">
+                <span>Audio File</span>
+                <input id="audioUpload" type="file" accept="audio/*" required>
+            </div>
+            <div class="file-path-wrapper">
+                <input class="file-path validate" type="text" required>
+            </div>
+        </div>
+        <button class="btn-large purple" onclick="uploadPodcast()">Upload</button>
+    </div>
+    <h3>Listen to a Podcast</h3>
     <div id="podcasts" class="podcasts"></div>
     <script src="js/script.js"></script>
 </body>

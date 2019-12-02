@@ -1,12 +1,14 @@
 body {
     background-color: #121212;
     color: white;
+    text-align: center;
 }
 
 .podcasts {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    text-align: left;
 }
 
 .podcast-card {
@@ -40,4 +42,17 @@ body {
 
 .donate {
     margin-left: auto;
+}
+
+.upload {
+    /* display: flex;
+    justify-content: center; */
+    background-color: #212121;
+    padding: 20px;
+    border-radius: 20px;
+    margin: 0 50px 0 50px;
+}
+
+input {
+    color: white;
 }
