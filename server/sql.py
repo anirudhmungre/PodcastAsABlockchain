@@ -35,11 +35,16 @@ class SQL(object):
                 conn.close()
         return podcast_id, date
     
-    def select(self, tablename) -> list:
+    def select(self, tablename, id=None) -> list:
         """ query parts from the parts table """
         conn = None
         rows = None
-        sql = f'SELECT * FROM {tablename} ORDER BY date DESC'
+        sql = None
+        if id is None:
+            sql = f'SELECT id, title, posterKey, date FROM {tablename} ORDER BY date DESC'
+        else:
+            sql = f'SELECT media FROM {tablename} WHERE id=\'{id}\''
+
         try:
             conn = connect(**config())
             cur = conn.cursor()

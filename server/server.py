@@ -3,6 +3,7 @@ from podchain import PodChain
 from sql import SQL
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from uuid import uuid4
 from datetime import datetime
 
@@ -18,6 +19,7 @@ elif len(argv) > 2:
 
 # Initialize Flask Object
 app = Flask(__name__)
+CORS(app)
 
 def check_params(required, given) -> bool:
     """
@@ -89,7 +91,7 @@ def new_transaction():
     # Ensure all data is sent correctly
     required = ['sender', 'recipient', 'amount']
     if not check_params(required, data.keys()):
-        return 'Missing values', 400
+        return {'message': 'Missing values'}, 400
 
     # Add a new Transaction
     index = podchain.new_transaction(data['sender'], data['recipient'], data['amount'])
@@ -108,7 +110,7 @@ def add_node():
     # Retrieve the new list of given nodes
     nodes = data.get('nodes')
     if nodes is None:
-        return "Invalid or empty list of nodes", 400
+        return {'message': 'Invalid or empty list of nodes'}, 400
     # Loop through all given nodes and add each to node set
     for node in nodes:
         podchain.add_node(node)
@@ -164,10 +166,9 @@ def podcasts():
     resp = [{
             'id': id,
             'title': title,
-            'media': media,
             'posterKey': posterKey,
             'date': date
-        } for id, title, media, posterKey, date in sql.select('Podcast')]
+        } for id, title, posterKey, date in sql.select('Podcast')]
     return jsonify(resp), 200
 
 @app.route('/podcasts/add', methods=['POST'])
@@ -185,7 +186,7 @@ def add_podcast():
     data = request.get_json()
     required = ['title', 'media', 'posterKey']
     if data and not check_params(required, data.keys()):
-        return 'Missing values', 400
+        return jsonify({'message': 'Missing values!'}), 400
 
     podcast_id, date = sql.insert('Podcast', data)
 
