@@ -1,11 +1,15 @@
 let b64audio = '';
+let currentMedia;
 
-const generatePodcastCard = (title, media, posterKey, date) => {
+const generatePodcastCard = (title, media, posterKey, date, index) => {
     return `
         <div class="podcast-card">
             <div>
-                <button class="btn-floating btn-large purple" onclick="playPodcast('${media}')">
+                <button id="playButton${index}" class="btn-floating btn-large purple" onclick="playPodcast(this, '${media}')">
                     <i class="material-icons">play_circle_filled</i>
+                </button>
+                <button id="pauseButton${index}" class="btn-floating btn-large purple" onclick="pausePodcast(this)" style="display: none;">
+                    <i class="material-icons">pause_circle_filled</i>
                 </button>
             </div>
             <div class="podcast-info">
@@ -30,8 +34,10 @@ const loadPodcasts = () => {
     let url = 'http://localhost:5000/podcasts';
     fetch(url).then(resp => {
         resp.json().then(podcasts => {
+            let index = 0;
             podcasts.forEach(p => {
-                podList.innerHTML += generatePodcastCard(p.title, p.media, p.posterKey, p.date);
+                podList.innerHTML += generatePodcastCard(p.title, p.media, p.posterKey, p.date, index);
+                index++;
             });
         })
     });
@@ -42,8 +48,30 @@ const donate = (btn) => {
     // TODO: Perform donation action
 }
 
-const playPodcast = (media) => {
-    console.log(media);
+const playPodcast = (btn, media) => {
+    try {
+        currentMedia = new Audio(`data:audio/wav;base64,${media}`);
+        currentMedia.play();
+        btn.style.display = 'none';
+        let index = btn.id.match(/\d+/g).map(Number);
+        document.getElementById(`pauseButton${index}`).style.display = 'initial';
+    } catch (err) {
+        alert('Something went wrong!');
+        console.error(err);
+    }
+};
+
+const pausePodcast = (btn) => {
+    try {
+        currentMedia.pause();
+        currentMedia = null;
+        let index = btn.id.match(/\d+/g).map(Number);
+        btn.style.display = 'none';
+        document.getElementById(`playButton${index}`).style.display = 'initial';
+    } catch (err) {
+        alert("Something went wrong!");
+        console.error(err);
+    }
 };
 
 const uploadPodcast = () => {
@@ -78,7 +106,6 @@ const handleAudioUpload = (event) => {
         reader.onload = (readerEvent) => {
             let binaryString = readerEvent.target.result;
             b64audio = btoa(binaryString);
-            console.log(b64audio)
         };
 
         reader.readAsBinaryString(file);
