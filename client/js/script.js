@@ -1,5 +1,6 @@
 let b64audio = '';
 let currentMedia;
+let mineWorker;
 
 const generatePodcastCard = (title, media, posterKey, date, index) => {
     return `
@@ -20,7 +21,7 @@ const generatePodcastCard = (title, media, posterKey, date, index) => {
                 </div>
             </div>
             <div class="donate">
-                <button class="btn-floating btn-large green" onclick="donate(this)">
+                <button class="btn-floating btn-large green" onclick="donate('${posterKey}')">
                     <i class="material-icons">attach_money</i>
                 </button>
             </div>
@@ -43,18 +44,50 @@ const loadPodcasts = () => {
     });
 };
 
-const donate = (btn) => {
-    btn.disabled = true;
-    // TODO: Perform donation action
+const donate = (posterKey) => {
+    console.log(posterKey);
+    // TODO add modal
+    let publicKey = document.getElementById('publicKey').value;
+    if (publicKey) {
+        let amount = 5;
+        let url = 'http://localhost:5000/transactions/new';
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ sender: publicKey, recipient: posterKey, amount: amount })
+        }).then(resp => {
+            if (resp.status == 201) {
+                alert("Donation Succesful!")
+            }
+        });
+    } else {
+        alert('Please enter your wallets public key to donate to a podcaster!');
+    }
 }
 
 const playPodcast = (btn, media) => {
     try {
         currentMedia = new Audio(`data:audio/wav;base64,${media}`);
-        currentMedia.play();
-        btn.style.display = 'none';
-        let index = btn.id.match(/\d+/g).map(Number);
-        document.getElementById(`pauseButton${index}`).style.display = 'initial';
+        if (document.getElementById('wantMine').checked && document.getElementById('publicKey').value) {
+            mineWorker = new Worker("js/mine.js");
+            mineWorker.onmessage = event => {
+                console.log(event.data);
+            };
+            btn.style.display = 'none';
+            let index = btn.id.match(/\d+/g).map(Number);
+            document.getElementById(`pauseButton${index}`).style.display = 'initial';
+            currentMedia.play();
+        } else if (document.getElementById('wantMine').checked && !document.getElementById('publicKey').value) {
+            alert("If you want to mine please first input your PodCoin public key at the top of the page!")
+        } else {
+            btn.style.display = 'none';
+            let index = btn.id.match(/\d+/g).map(Number);
+            document.getElementById(`pauseButton${index}`).style.display = 'initial';
+            currentMedia.play();
+        }
     } catch (err) {
         alert('Something went wrong!');
         console.error(err);
@@ -63,6 +96,10 @@ const playPodcast = (btn, media) => {
 
 const pausePodcast = (btn) => {
     try {
+        if (mineWorker) {
+            mineWorker.terminate();
+            mineWorker = undefined;
+        }
         currentMedia.pause();
         currentMedia = null;
         let index = btn.id.match(/\d+/g).map(Number);
@@ -75,9 +112,9 @@ const pausePodcast = (btn) => {
 };
 
 const uploadPodcast = () => {
-    let title = document.getElementById('title');
-    let publicKey = document.getElementById('pubKey');
-    if (title.value && publicKey.value && b64audio) {
+    let title = document.getElementById('title').value;
+    let posterKey = document.getElementById('posterKey').value;
+    if (title && posterKey && b64audio) {
         let url = 'http://localhost:5000/podcasts/add';
         fetch(url, {
             method: 'POST',
@@ -85,11 +122,13 @@ const uploadPodcast = () => {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ title: title.value, media: b64audio, posterKey: publicKey.value })
+            body: JSON.stringify({ title: title, media: b64audio, posterKey: posterKey })
         }).then(resp => {
-            alert("Upload Successful!")
-            b64audio = '';
-            location.reload()
+            if (resp.status == 200) {
+                alert("Upload Successful!")
+                b64audio = '';
+                location.reload()
+            }
         });
     } else {
         alert('Please fill in all fields');

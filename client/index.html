@@ -19,7 +19,7 @@
     <h3>Upload a Podcast</h3>
     <div id="upload" class="upload">
         <input id="title" placeholder="Title" required>
-        <input id="pubKey" placeholder="PodCoin Wallet Public Key" required>
+        <input id="posterKey" placeholder="PodCoin Wallet Public Key" required>
         <div class="file-field input-field">
             <div class="btn purple">
                 <span>Audio File</span>
@@ -31,7 +31,19 @@
         </div>
         <button class="btn-large purple" onclick="uploadPodcast()">Upload</button>
     </div>
-    <h3>Listen to a Podcast</h3>
+    <div>
+        <h3>Listen to a Podcast</h3>
+        <p>Do you want to mine while listening?</p>
+        <div class="switch">
+            <label>
+                No
+                <input id="wantMine" type="checkbox">
+                <span class="lever"></span>
+                Yes
+            </label>
+        </div>
+        <input id="publicKey" type="text" placeholder="PodCoin Wallet Public Key">
+    </div>
     <div id="podcasts" class="podcasts"></div>
     <script src="js/script.js"></script>
 </body>

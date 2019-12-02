@@ -127,8 +127,7 @@ class PodChain(object):
         # Return true if local chain was replaced and false otherwise
         return new_chain
 
-    @staticmethod
-    def valid_solution(previous_proof, proof) -> bool:
+    def valid_solution(self, previous_proof, proof) -> bool:
         """
         Checks if previous and current proof combined contain 4 leading zeroes
         :param previous_proof: <int> Previous Proof
