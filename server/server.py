@@ -1,8 +1,10 @@
 from sys import argv, exit
 from podchain import PodChain
+from sql import SQL
 
 from flask import Flask, jsonify, request
 from uuid import uuid4
+from datetime import datetime
 
 # Make sure user is using correct number of args
 if len(argv) < 2:
@@ -16,6 +18,17 @@ elif len(argv) > 2:
 
 # Initialize Flask Object
 app = Flask(__name__)
+
+def check_params(required, given) -> bool:
+    """
+    Ensures that all the required params are posted
+    :param required: <list> List of required params on POST
+    :param given: <list> List of given params in body of POST
+    :return: <bool> True if correct params provided, False if not
+    """
+    if not all(x in given for x in required):
+        return False
+    return True
 
 # -------------------------------------------------
 #  EVERYTHING BELOW UNTIL MARKER IS FOR BLOCKCHAIN
@@ -75,7 +88,7 @@ def new_transaction():
 
     # Ensure all data is sent correctly
     required = ['sender', 'recipient', 'amount']
-    if not all(x in data for x in required):
+    if not check_params(required, data.keys()):
         return 'Missing values', 400
 
     # Add a new Transaction
@@ -130,6 +143,68 @@ def consensus():
 #  EVERYTHING ABOVE UNTIL MARKER IS FOR BLOCKCHAIN
 # -------------------------------------------------
 
+# --------------------------------------------------
+#  EVERYTHING BELOW UNTIL MARKER IS FOR APPLICATION
+# --------------------------------------------------
+
+sql = SQL()
+
+@app.route('/podcasts', methods=['GET'])
+def podcasts():
+    """
+    This will return all podcasts as a list in the below format
+    {
+        'id': uuid;
+        'title': string;
+        'media': base64;
+        'posterKey': string;
+        'date': DATE;
+    }
+    """
+    resp = [{
+            'id': id,
+            'title': title,
+            'media': media,
+            'posterKey': posterKey,
+            'date': date
+        } for id, title, media, posterKey, date in sql.select('Podcast')]
+    return jsonify(resp), 200
+
+@app.route('/podcasts/add', methods=['POST'])
+def add_podcast():
+    """
+    This will add a podcast in the below format
+    { 
+        'id': uuid;
+        'title': string;
+        'media': base64;
+        'posterKey': string;
+        'date': DATE;
+    }
+    """
+    data = request.get_json()
+    required = ['title', 'media', 'posterKey']
+    if data and not check_params(required, data.keys()):
+        return 'Missing values', 400
+
+    podcast_id, date = sql.insert('Podcast', data)
+
+    resp = {
+        'message': 'The below was added as a podcast.',
+        'podcast': {
+            'id': podcast_id,
+            'title': data['title'],
+            'media': data['media'],
+            'posterKey': data['posterKey'],
+            'date': date
+        }
+    }
+
+    return resp, 200
+
+# --------------------------------------------------
+#  EVERYTHING ABOVE UNTIL MARKER IS FOR APPLICATION
+# --------------------------------------------------
 if __name__ == '__main__':
     print(f'Starting server on port {argv[1]}')
     app.run(port=argv[1], debug=True)
