@@ -42,7 +42,7 @@ node_identifier = str(uuid4()).replace('-', '')
 # Initialize the PodChain
 podchain = PodChain()
 guesses = dict()
-PRIZE = 10.0
+PRIZE = 100.0
 
 @app.route('/chain', methods=['GET'])
 def full_chain():
@@ -141,9 +141,12 @@ def mine():
             portion_won = prize_for_donators * (amount/total_donated)
             podchain.new_transaction('0', userKey, portion_won)
             print(f'For DONATION: Sending {portion_won} PodCoin to {userKey}')
+        
+        # Achieve consensus because new block now available
+        podchain.achieve_consensus()
 
         resp = {
-            'message': f'You found the solution! New block added to the PodChain! You have been sent {prize_for_solver}',
+            'message': f"You found the solution! Block {block['index']} added to the PodChain! You have been sent {prize_for_solver} plus a portion of the mining prize!",
             'index': block['index'],
             'transactions': block['transactions'],
             'proof': block['proof'],
@@ -172,12 +175,19 @@ def new_transaction():
         return {'message': 'Missing values'}, 400
 
     # Add a new Transaction
-    index = podchain.new_transaction(data['sender'], data['recipient'], data['amount'])
-
-    resp = {
-        'message': f'Transaction added at index: {index}'
-    }
-    return jsonify(resp), 201
+    succesful = podchain.new_transaction(data['sender'], data['recipient'], data['amount'])
+     
+    # True if transaction succesful
+    if succesful:
+        resp = {
+            'message': f"{data['amount']} PodCoin Sent Succesfully!"
+        }
+        return jsonify(resp), 201
+    else:
+        resp = {
+            'message': f"Not enough funds. Only {podchain.get_amount(data['sender'])}"
+        }
+        return jsonify(resp), 400
 
 @app.route('/nodes/add', methods=['POST'])
 def add_node():
@@ -222,6 +232,50 @@ def consensus():
 # -------------------------------------------------
 #  EVERYTHING ABOVE UNTIL MARKER IS FOR BLOCKCHAIN
 # -------------------------------------------------
+
+# ----------------------------------------------
+#  EVERYTHING BELOW UNTIL MARKER IS FOR WALLETS
+# ----------------------------------------------
+
+@app.route('/wallets/add', methods=['POST'])
+def add_wallet():
+    """
+    Adds a new wallet to the blockchain
+    """
+    data = request.get_json()
+
+    # Ensure all data is sent correctly
+    required = ['publicKey']
+    if not check_params(required, data.keys()):
+        return {'message': 'Missing values'}, 400
+    
+    added = podchain.add_wallet(data['publicKey'])
+    if added:
+        return {'message': 'Wallet succesfully added!', 'publicKey': data['publicKey']}, 201
+    else:
+        return {'message': 'Wallet already exists!', 'publicKey': data['publicKey']}, 409
+
+@app.route('/wallets/amount', methods=['POST'])
+def get_amount():
+    """
+    Gets the amount of PodCoin in the given wallet
+    """
+    data = request.get_json()
+
+    # Ensure all data is sent correctly
+    required = ['publicKey']
+    if not check_params(required, data.keys()):
+        return {'message': 'Missing values'}, 400
+    
+    amount = podchain.get_amount(data['publicKey'])
+    if amount == -1:
+        return {'message': 'Wallet does not exist! Please add wallet!', 'publicKey': data['publicKey'], 'amount': amount}, 404 
+    else:
+        return {'message': 'PodCoin wallet amount refreshed!', 'publicKey': data['publicKey'], 'amount': amount}, 200
+
+# ----------------------------------------------
+#  EVERYTHING ABOVE UNTIL MARKER IS FOR WALLETS
+# ----------------------------------------------
 
 # --------------------------------------------------
 #  EVERYTHING BELOW UNTIL MARKER IS FOR APPLICATION

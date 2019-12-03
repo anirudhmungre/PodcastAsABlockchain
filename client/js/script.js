@@ -64,11 +64,13 @@ const donate = () => {
             },
             body: JSON.stringify({ sender: publicKey, recipient: posterKey, amount: amount })
         }).then(resp => {
-            if (resp.status == 201) {
-                toast('Donation Succesful!');
-                let instance = M.Modal.init(document.querySelector('.modal'))
-                instance.close();
-            }
+            resp.json().then(data => {
+                if (resp.status == 201) {
+                    let instance = M.Modal.init(document.querySelector('.modal'))
+                    instance.close();
+                }
+                toast(data.message);
+            });
         });
     } else {
         toast('Enter an amount greater than 0.01 please.')
@@ -77,7 +79,6 @@ const donate = () => {
 
 const openDonate = (posterKey) => {
     let publicKey = document.getElementById('publicKey').value;
-    console.log(posterKey);
     if (publicKey) {
         let instance = M.Modal.init(document.querySelector('.modal'))
         instance.open();
@@ -86,6 +87,51 @@ const openDonate = (posterKey) => {
         toast('Please enter your wallets public key to donate to a podcaster!');
     }
 }
+
+const refreshWallet = () => {
+    let walletAmount = document.getElementById('walletAmount');
+    let publicKey = document.getElementById('publicKey').value
+    if (publicKey) {
+        let url = 'http://localhost:5000/wallets/amount';
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ publicKey: publicKey })
+        }).then(resp => {
+            resp.json().then(data => {
+                toast(data.message);
+                walletAmount.textContent = data.amount;
+            });
+        });
+    } else {
+        toast('Please input a public wallet key to check amount!');
+    }
+};
+
+const addWallet = () => {
+    let publicKey = document.getElementById('publicKey').value
+    if (publicKey) {
+        let url = 'http://localhost:5000/wallets/add';
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ publicKey: publicKey })
+        }).then(resp => {
+            resp.json().then(data => {
+                toast(data.message);
+                refreshWallet();
+            });
+        });
+    } else {
+        toast('Please input a public wallet key to add to podchain!');
+    }
+};
 
 const playPodcast = (btn, media) => {
     try {
@@ -103,13 +149,14 @@ const playPodcast = (btn, media) => {
             mineWorker = new Worker("js/mine.js");
             mineWorker.postMessage(document.getElementById('publicKey').value);
             mineWorker.onmessage = event => {
-                console.log(event.data);
+                toast(event.data);
             };
             btn.style.display = 'none';
             document.getElementById(`pauseButton${index}`).style.display = 'initial';
             currentMedia.play();
         } else if (document.getElementById('wantMine').checked && !document.getElementById('publicKey').value) {
             toast("To mine please first input your PodCoin public key!");
+            currentMedia = undefined;
         } else {
             btn.style.display = 'none';
             document.getElementById(`pauseButton${index}`).style.display = 'initial';

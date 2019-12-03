@@ -10,8 +10,9 @@ class PodChain(object):
         Initializes the blockchain
         """
         self.difficulty = 1
-        self.podchain = []
-        self.current_transactions = []
+        self.podchain = list()
+        self.current_transactions = list()
+        self.wallets = {'0': 1000000000.0 }
         self.nodes = set()
         # Create the genesis block
         self.new_block(100, 1)
@@ -29,7 +30,8 @@ class PodChain(object):
             'timestamp': time(),
             'transactions': self.current_transactions,
             'proof': proof,
-            'previous_hash': previous_hash or self.hash(self.podchain[-1])
+            'previous_hash': previous_hash or self.hash(self.last_block),
+            'wallets': self.wallets
         }
 
         # Reset the current list of transactions
@@ -46,13 +48,24 @@ class PodChain(object):
         :param amount: <int> Amount to be exchanged
         :return: <int> The index of the Block that will contain the transaction data
         """
+        # Check wallets added prior
+        self.add_wallet(sender)
+        self.add_wallet(recipient)
+
+        if self.wallets[sender] - amount < 0:
+            return False
+        # Remove sender funds
+        self.wallets[sender] -= amount
+        # Add to recipient wallet
+        self.wallets[recipient] += amount
+        # Record Transaction
         self.current_transactions.append({
             'sender': sender,
             'recipient': recipient,
             'amount': amount
         })
 
-        return self.last_block['index'] + 1
+        return True
 
     def proof_of_work(self, previous_proof) -> int:
         """
@@ -107,7 +120,7 @@ class PodChain(object):
         new_chain = False
 
         # Get max length because only chains larger than the current chain are more valid
-        local_length = len(self.chain)
+        local_length = len(self.podchain)
 
         # Check chains of all other nodes
         for node in self.nodes:
@@ -138,6 +151,29 @@ class PodChain(object):
         guess = f'{previous_proof}{proof}'.encode()
         guess_hash = sha256(guess).hexdigest()
         return guess_hash[:self.difficulty] == "0" * self.difficulty
+
+    def add_wallet(self, public_key) -> bool:
+        """
+        Adds a wallet to the podchains wallets
+        :param public_key: <str> The public key of the wallet to add
+        :return: <bool> True if wallet added, False if already exists
+        """
+        # Check if wallet already in podchain
+        if public_key in self.wallets:
+            return False
+        self.wallets[public_key] = 0.0
+        return True
+
+    def get_amount(self, public_key) -> float:
+        """
+        Returns the PodCoin amount in a specific wallet
+        :param public_key: <str> Wallet public key to get amount of
+        :return: <float> Amount of PodCoin in specified wallet -1.0 if wallet doesn't exist
+        """
+        if public_key in self.wallets:
+            return self.wallets[public_key]
+        else:
+            return -1.0
     
     @staticmethod
     def hash(block) -> str:

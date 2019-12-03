@@ -25,7 +25,7 @@
             <ul class="tabs tabs-transparent">
                 <li class="tab"><a href="#listenTab" class="active">Listen</a></li>
                 <li class="tab"><a href="#uploadTab">Upload</a></li>
-                <li class="tab"><a href="#walletTab">Wallet</a></li>
+                <li class="tab"><a href="#walletTab" onclick="refreshWallet()">Wallet</a></li>
             </ul>
         </div>
     </nav>
@@ -71,18 +71,26 @@
                     <input class="file-path validate" type="text" required>
                 </div>
             </div>
-            <button class="btn purple" onclick="uploadPodcast()">Upload</button>
+            <button class="btn-large purple" onclick="uploadPodcast()">Upload</button>
         </div>
     </div>
 
     <div id="walletTab">
         <h3>My Wallet</h3>
         <div id="wallet" class="optionCard">
-            <label for="publicKey">Wallet Public Key: </label>
-            <input id="publicKey" type="text" placeholder="PodCoin Wallet Public Key">
-            <p>Total PodCoin: <span id="walletAmount"></span></p>
+            <p>Wallet Public Key: <input id="publicKey" type="text" placeholder="PodCoin Wallet Public Key"></p>
+            <div class="row">
+                <button class="btn-large waves-effect purple col s6" onclick="refreshWallet()">Refresh</button>
+                <button class="btn-large waves-effect purple col s6" onclick="addWallet()">Add Wallet</button>
+            </div>
         </div>
+        <h3>Total PodCoin</h3>
+        <div class="optionCard">
+            <span id="walletAmount"></span>
+        </div>
+
     </div>
+    <!-- <script src="js/mine.js"></script> -->
     <script src="js/script.js"></script>
 </body>
 
