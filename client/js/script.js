@@ -87,6 +87,7 @@ const openDonate = (posterKey) => {
 
 const playPodcast = (btn, media) => {
     try {
+        if (currentMedia) { return; }
         currentMedia = new Audio(`data:audio/wav;base64,${media}`);
         let index = btn.id.match(/\d+/g).map(Number);
         currentMedia.onended = () => {
