@@ -1,3 +1,5 @@
+M.AutoInit();
+
 let b64audio = '';
 let currentMedia;
 let mineWorker;

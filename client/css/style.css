@@ -1,3 +1,7 @@
+html {
+    overflow-y: scroll;
+}
+
 body {
     background-color: #121212;
     color: white;
@@ -44,12 +48,16 @@ body {
     margin-left: auto;
 }
 
-.upload {
-    width: 30vw;
+.optionCard {
+    width: 60vw;
     background-color: #212121;
     padding: 20px 50px 20px 50px;
     border-radius: 20px;
     margin: 0 auto;
+}
+
+#wallet {
+    text-align: left;
 }
 
 input {
@@ -72,4 +80,12 @@ i {
 .modal-footer {
     background-color: #121212 !important;
     color: white !important;
+}
+
+.switch label input[type=checkbox]:checked+.lever {
+    background-color: #9c27b0;
+}
+
+.switch label input[type=checkbox]:checked+.lever:after {
+    background-color: #9c27b0;
 }
