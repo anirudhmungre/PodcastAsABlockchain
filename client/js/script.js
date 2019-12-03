@@ -2,6 +2,10 @@ let b64audio = '';
 let currentMedia;
 let mineWorker;
 
+const toast = (text) => {
+    M.toast({ html: text, classes: 'rounded' });
+};
+
 const generatePodcastCard = (title, media, posterKey, date, index) => {
     return `
         <div class="podcast-card">
@@ -59,13 +63,13 @@ const donate = () => {
             body: JSON.stringify({ sender: publicKey, recipient: posterKey, amount: amount })
         }).then(resp => {
             if (resp.status == 201) {
-                alert("Donation Succesful!")
+                toast('Donation Succesful!');
                 let instance = M.Modal.init(document.querySelector('.modal'))
                 instance.close();
             }
         });
     } else {
-        alert('Enter an amount greater than 0.01 please.')
+        toast('Enter an amount greater than 0.01 please.')
     }
 };
 
@@ -77,7 +81,7 @@ const openDonate = (posterKey) => {
         instance.open();
         document.getElementById('sendTo').textContent = posterKey;
     } else {
-        alert('Please enter your wallets public key to donate to a podcaster!');
+        toast('Please enter your wallets public key to donate to a podcaster!');
     }
 }
 
@@ -102,14 +106,14 @@ const playPodcast = (btn, media) => {
             document.getElementById(`pauseButton${index}`).style.display = 'initial';
             currentMedia.play();
         } else if (document.getElementById('wantMine').checked && !document.getElementById('publicKey').value) {
-            alert("If you want to mine please first input your PodCoin public key at the top of the page!")
+            toast("To mine please first input your PodCoin public key!");
         } else {
             btn.style.display = 'none';
             document.getElementById(`pauseButton${index}`).style.display = 'initial';
             currentMedia.play();
         }
     } catch (err) {
-        alert('Something went wrong!');
+        toast('Something went wrong!');
         console.error(err);
     }
 };
@@ -126,7 +130,7 @@ const pausePodcast = (btn) => {
         btn.style.display = 'none';
         document.getElementById(`playButton${index}`).style.display = 'initial';
     } catch (err) {
-        alert("Something went wrong!");
+        toast("Something went wrong!");
         console.error(err);
     }
 };
@@ -145,13 +149,13 @@ const uploadPodcast = () => {
             body: JSON.stringify({ title: title, media: b64audio, posterKey: posterKey })
         }).then(resp => {
             if (resp.status == 200) {
-                alert("Upload Successful!")
+                toast("Upload Successful!")
                 b64audio = '';
                 location.reload()
             }
         });
     } else {
-        alert('Please fill in all fields');
+        toast('Please fill in all fields to upload!');
     }
 };
 
