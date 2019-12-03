@@ -45,6 +45,17 @@
         <input id="publicKey" type="text" placeholder="PodCoin Wallet Public Key">
     </div>
     <div id="podcasts" class="podcasts"></div>
+    <div class="modal">
+        <div class="modal-content">
+            <h4>Donation</h4>
+            <p>Sending To: <span id="sendTo"></span></p>
+            <input id="amount" type="number" placeholder="Amount to Donate (Minimum 0.01)" min="0.01" step="0.01">
+        </div>
+        <div class="modal-footer">
+            <button class="modal-close waves-effect waves-purple btn-flat">Cancel</button>
+            <button class="waves-effect waves-purple btn-flat" onclick="donate()">Confirm</button>
+        </div>
+    </div>
     <script src="js/script.js"></script>
 </body>
 

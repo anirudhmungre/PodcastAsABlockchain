@@ -41,6 +41,8 @@ node_identifier = str(uuid4()).replace('-', '')
 
 # Initialize the PodChain
 podchain = PodChain()
+guesses = dict()
+PRIZE = 10.0
 
 @app.route('/chain', methods=['GET'])
 def full_chain():
@@ -53,26 +55,18 @@ def full_chain():
     }
     return jsonify(resp), 200
 
-@app.route('/mine', methods=['GET'])
-def mine():
-    """
-    Must calculate the PoW (proof of work), reward the miner, and add new block to podchain
-    """
-    # Get proof of work
+@app.route('/mine/cheat', methods=['GET'])
+def mine_cheat():
     last_block = podchain.last_block
     last_proof = last_block['proof']
     proof = podchain.proof_of_work(last_proof)
 
-    # Send reward based on proof
-    # TODO: SEND REWARD BASED ON NUMBER OF TRANSACTIONS
-    podchain.new_transaction("0", node_identifier, 1)
-
-    # Add new block to the podchain!
     previous_hash = podchain.hash(last_block)
     block = podchain.new_block(proof, previous_hash)
+    podchain.new_transaction('0', node_identifier, PRIZE)
 
     resp = {
-        'message': "New Block Added to PodChain",
+        'message': f'You found the solution! New block added to the PodChain!',
         'index': block['index'],
         'transactions': block['transactions'],
         'proof': block['proof'],
@@ -80,6 +74,90 @@ def mine():
     }
 
     return jsonify(resp), 200
+
+
+@app.route('/mine', methods=['POST'])
+def mine():
+    """
+    Must calculate the PoW (proof of work), reward the miner, and add new block to podchain
+    """
+    global guesses, PRIZE
+    data = request.get_json()
+
+    # Ensure all data is sent correctly
+    required = ['publicKey', 'guess']
+    if not check_params(required, data.keys()):
+        return {'message': 'Missing values'}, 400
+    
+    # Add a guess to the public key of the user who submitted it
+    if data['publicKey'] in guesses:
+        guesses[data['publicKey']] += 1
+    else:
+        guesses[data['publicKey']] = 0
+
+    # Get previous blocks solution
+    last_block = podchain.last_block
+    last_proof = last_block['proof']
+    # proof = podchain.proof_of_work(last_proof)
+    solved = podchain.valid_solution(last_proof, data['guess'])
+    if solved:
+        # Send reward based on proof
+        # TODO: SEND REWARD BASED ON NUMBER OF TRANSACTIONS
+        # podchain.new_transaction("0", node_identifier, 1)
+
+        # Add new block to the podchain!
+        previous_hash = podchain.hash(last_block)
+        block = podchain.new_block(data['guess'], previous_hash)
+
+        # Divy up prizes
+        prize_for_solver = PRIZE * 0.2
+        prize_for_donators = PRIZE * 0.5
+        prize_for_miners = PRIZE * 0.3
+
+        # Separate prize for solver
+        podchain.new_transaction('0', data['publicKey'], prize_for_solver)
+        print(f"For SOLVING: Sending {prize_for_solver} PodCoin to {data['publicKey']}")
+
+        # Separate prize for other miners
+        total_guesses = float(sum(guesses.values()))
+        for userKey, amount in guesses.items():
+            portion_won = prize_for_miners * (amount/total_guesses)
+            podchain.new_transaction('0', userKey, portion_won)
+            print(f'For MINING: Sending {portion_won} PodCoin to {userKey}')
+        # Reset the guesses
+        guesses = dict()
+
+        # Separate prize for donators
+        donators = dict()
+        for t in block['transactions']:
+            if t['sender'] != '0':
+                if t['sender'] in donators:
+                    donators[t['sender']] += t['amount']
+                else:
+                    donators[t['sender']] = t['amount']
+
+        total_donated = float(sum(donators.values()))
+        for userKey, amount in donators.items():
+            portion_won = prize_for_donators * (amount/total_donated)
+            podchain.new_transaction('0', userKey, portion_won)
+            print(f'For DONATION: Sending {portion_won} PodCoin to {userKey}')
+
+        resp = {
+            'message': f'You found the solution! New block added to the PodChain! You have been sent {prize_for_solver}',
+            'index': block['index'],
+            'transactions': block['transactions'],
+            'proof': block['proof'],
+            'previous_hash': block['previous_hash']
+        }
+
+        return jsonify(resp), 200
+    else:
+        resp = {
+            'message': 'Incorrect value! New block was not mined!',
+            'guess': data['guess']
+        }
+
+        return jsonify(resp), 200
   
 @app.route('/transactions/new', methods=['POST'])
 def new_transaction():

@@ -21,7 +21,7 @@ const generatePodcastCard = (title, media, posterKey, date, index) => {
                 </div>
             </div>
             <div class="donate">
-                <button class="btn-floating btn-large green" onclick="donate('${posterKey}')">
+                <button class="btn-floating btn-large green" onclick="openDonate('${posterKey}')">
                     <i class="material-icons">attach_money</i>
                 </button>
             </div>
@@ -44,12 +44,11 @@ const loadPodcasts = () => {
     });
 };
 
-const donate = (posterKey) => {
-    console.log(posterKey);
-    // TODO add modal
+const donate = () => {
+    let amount = parseFloat(document.getElementById('amount').value);
+    let posterKey = document.getElementById('sendTo').textContent;
     let publicKey = document.getElementById('publicKey').value;
-    if (publicKey) {
-        let amount = 5;
+    if (amount > 0.01) {
         let url = 'http://localhost:5000/transactions/new';
         fetch(url, {
             method: 'POST',
@@ -61,8 +60,22 @@ const donate = (posterKey) => {
         }).then(resp => {
             if (resp.status == 201) {
                 alert("Donation Succesful!")
+                let instance = M.Modal.init(document.querySelector('.modal'))
+                instance.close();
             }
         });
+    } else {
+        alert('Enter an amount greater than 0.01 please.')
+    }
+};
+
+const openDonate = (posterKey) => {
+    let publicKey = document.getElementById('publicKey').value;
+    console.log(posterKey);
+    if (publicKey) {
+        let instance = M.Modal.init(document.querySelector('.modal'))
+        instance.open();
+        document.getElementById('sendTo').textContent = posterKey;
     } else {
         alert('Please enter your wallets public key to donate to a podcaster!');
     }
@@ -71,20 +84,27 @@ const donate = (posterKey) => {
 const playPodcast = (btn, media) => {
     try {
         currentMedia = new Audio(`data:audio/wav;base64,${media}`);
+        let index = btn.id.match(/\d+/g).map(Number);
+        currentMedia.onended = () => {
+            btn.style.display = 'initial';
+            document.getElementById(`pauseButton${index}`).style.display = 'none';
+            if (mineWorker) {
+                mineWorker.terminate();
+            }
+        }
         if (document.getElementById('wantMine').checked && document.getElementById('publicKey').value) {
             mineWorker = new Worker("js/mine.js");
+            mineWorker.postMessage(document.getElementById('publicKey').value);
             mineWorker.onmessage = event => {
                 console.log(event.data);
             };
             btn.style.display = 'none';
-            let index = btn.id.match(/\d+/g).map(Number);
             document.getElementById(`pauseButton${index}`).style.display = 'initial';
             currentMedia.play();
         } else if (document.getElementById('wantMine').checked && !document.getElementById('publicKey').value) {
             alert("If you want to mine please first input your PodCoin public key at the top of the page!")
         } else {
             btn.style.display = 'none';
-            let index = btn.id.match(/\d+/g).map(Number);
             document.getElementById(`pauseButton${index}`).style.display = 'initial';
             currentMedia.play();
         }

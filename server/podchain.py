@@ -9,6 +9,7 @@ class PodChain(object):
         """
         Initializes the blockchain
         """
+        self.difficulty = 1
         self.podchain = []
         self.current_transactions = []
         self.nodes = set()
@@ -136,7 +137,7 @@ class PodChain(object):
         """
         guess = f'{previous_proof}{proof}'.encode()
         guess_hash = sha256(guess).hexdigest()
-        return guess_hash[:4] == "0000"
+        return guess_hash[:self.difficulty] == "0" * self.difficulty
     
     @staticmethod
     def hash(block) -> str:
