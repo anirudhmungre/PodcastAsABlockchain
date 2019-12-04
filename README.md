@@ -4,7 +4,6 @@
 
 1. [What is PodChain](#What-is-PodChain?)  
 2. [Incentive System](#Incentive-System)
-3. [Dependencies](#Dependancies)
 4. [How to Install](#How-to-Install)
 5. [How to Run](#How-to-Run)
 6. [How to Use](#How-to-Use)
