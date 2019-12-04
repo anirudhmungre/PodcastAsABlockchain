@@ -1,0 +1,91 @@
+html {
+    overflow-y: scroll;
+}
+
+body {
+    background-color: #121212;
+    color: white;
+    text-align: center;
+}
+
+.podcasts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: left;
+}
+
+.podcast-card {
+    flex-basis: 51%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: #212121;
+    margin: 20px;
+    border-radius: 50px;
+    padding: 0 20px 0 20px;
+}
+
+.podcast-info {
+    margin: 0 0 0 30px;
+}
+
+.podcast-info>h2 {
+    margin: 10px 0 0 0;
+    font-size: 2em;
+}
+
+.podcast-info>div {
+    margin-bottom: 10px;
+}
+
+.podcast-info>div>p {
+    margin: 0;
+    font-size: 15px;
+}
+
+.donate {
+    margin-left: auto;
+}
+
+.optionCard {
+    width: 60vw;
+    background-color: #212121;
+    padding: 20px 50px 20px 50px;
+    border-radius: 20px;
+    margin: 0 auto;
+}
+
+#wallet {
+    text-align: left;
+}
+
+input {
+    color: white;
+    text-align: center;
+}
+
+#publicKey {
+    width: 40vw;
+}
+
+i {
+    font-size: 2.1em !important;
+}
+
+.modal {
+    background-color: #212121;
+}
+
+.modal-footer {
+    background-color: #121212 !important;
+    color: white !important;
+}
+
+.switch label input[type=checkbox]:checked+.lever {
+    background-color: #9c27b0;
+}
+
+.switch label input[type=checkbox]:checked+.lever:after {
+    background-color: #9c27b0;
+}

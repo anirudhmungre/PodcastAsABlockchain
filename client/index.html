@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>PodChain</title>
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="nav-extended black">
+        <div class="nav-wrapper">
+            <img src="images/logo.png" class="brand-logo center">
+        </div>
+        <div class="nav-content">
+            <ul class="tabs tabs-transparent">
+                <li class="tab"><a href="#listenTab" class="active">Listen</a></li>
+                <li class="tab"><a href="#uploadTab">Upload</a></li>
+                <li class="tab"><a href="#walletTab">Wallet</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="listenTab" class="col s12">
+        <div>
+            <h3>Listen to a Podcast</h3>
+            <p>Do you want to mine while listening?</p>
+            <div class="switch">
+                <label>
+                    No
+                    <input id="wantMine" type="checkbox">
+                    <span class="lever"></span>
+                    Yes
+                </label>
+            </div>
+        </div>
+        <div id="podcasts" class="podcasts"></div>
+        <div class="modal">
+            <div class="modal-content">
+                <h4>Donation</h4>
+                <p>Sending To: <span id="sendTo"></span></p>
+                <input id="amount" type="number" placeholder="Amount to Donate (Minimum 0.01)" min="0.01" step="0.01">
+            </div>
+            <div class="modal-footer">
+                <button class="modal-close waves-effect waves-purple btn-flat">Cancel</button>
+                <button class="waves-effect waves-purple btn-flat" onclick="donate()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="uploadTab" class="col s12">
+        <h3>Upload a Podcast</h3>
+        <div id="upload" class="optionCard">
+            <input id="title" placeholder="Title" required>
+            <input id="posterKey" placeholder="PodCoin Wallet Public Key" required>
+            <div class="file-field input-field">
+                <div class="btn purple">
+                    <span>Audio File</span>
+                    <input id="audioUpload" type="file" accept="audio/*" required>
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text" required>
+                </div>
+            </div>
+            <button class="btn purple" onclick="uploadPodcast()">Upload</button>
+        </div>
+    </div>
+
+    <div id="walletTab">
+        <h3>My Wallet</h3>
+        <div id="wallet" class="optionCard">
+            <label for="publicKey">Wallet Public Key: </label>
+            <input id="publicKey" type="text" placeholder="PodCoin Wallet Public Key">
+            <p>Total PodCoin: <span id="walletAmount"></span></p>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+
+</html>

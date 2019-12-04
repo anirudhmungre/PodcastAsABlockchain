@@ -9,6 +9,7 @@ class PodChain(object):
         """
         Initializes the blockchain
         """
+        self.difficulty = 1
         self.podchain = []
         self.current_transactions = []
         self.nodes = set()
@@ -127,8 +128,7 @@ class PodChain(object):
         # Return true if local chain was replaced and false otherwise
         return new_chain
 
-    @staticmethod
-    def valid_solution(previous_proof, proof) -> bool:
+    def valid_solution(self, previous_proof, proof) -> bool:
         """
         Checks if previous and current proof combined contain 4 leading zeroes
         :param previous_proof: <int> Previous Proof
@@ -137,7 +137,7 @@ class PodChain(object):
         """
         guess = f'{previous_proof}{proof}'.encode()
         guess_hash = sha256(guess).hexdigest()
-        return guess_hash[:4] == "0000"
+        return guess_hash[:self.difficulty] == "0" * self.difficulty
     
     @staticmethod
     def hash(block) -> str:
