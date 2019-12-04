@@ -66,7 +66,15 @@ This will create a Database by the name of **podcasting** -> Connect to the data
 
 ### Database
 
-Make sure postgres is running by opening pgadmin or starting the database from CLI
+1. Make sure postgres is running by opening pgadmin or starting the database from CLI
+2. Put a **database.ini** file in the **server** directory with the following configuration
+```ini
+[postgresql]
+host=localhost
+database=podcasting
+user=<postgres username. Default: postgres>
+password=<postgres password. Default: postgres>
+```
 
 ### Server
 
