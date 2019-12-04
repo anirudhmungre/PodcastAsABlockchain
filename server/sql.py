@@ -15,6 +15,7 @@ class SQL(object):
         # values = ','.join([f"'{x}'" for x in row.values()])
         sql = f'INSERT INTO {tablename} VALUES(default, %s, %s, %s, default) RETURNING id, date;'
         podcast_id = None
+        conn = None
         try:
             # Connect to the DB
             conn = connect(**self.params)
@@ -46,7 +47,7 @@ class SQL(object):
             sql = f'SELECT media FROM {tablename} WHERE id=\'{id}\''
 
         try:
-            conn = connect(**config())
+            conn = connect(**self.params)
             cur = conn.cursor()
             cur.execute(sql)
             rows = cur.fetchall()

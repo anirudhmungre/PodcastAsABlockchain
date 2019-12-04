@@ -70,7 +70,7 @@ input {
 }
 
 i {
-    font-size: 2.1em !important;
+    font-size: 2em !important;
 }
 
 .modal {
@@ -88,4 +88,12 @@ i {
 
 .switch label input[type=checkbox]:checked+.lever:after {
     background-color: #9c27b0;
+}
+
+button {
+    color: white !important;
+}
+
+#walletAmount {
+    font-size: 40px;
 }
