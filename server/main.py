@@ -32,6 +32,10 @@ def check_params(required, given) -> bool:
         return False
     return True
 
+@app.route('/')
+def root():
+    return jsonify({ 'message': 'Hello World' }), 200
+
 # -------------------------------------------------
 #  EVERYTHING BELOW UNTIL MARKER IS FOR BLOCKCHAIN
 # -------------------------------------------------
