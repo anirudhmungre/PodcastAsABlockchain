@@ -34,6 +34,9 @@ def check_params(required, given) -> bool:
 
 @app.route('/')
 def root():
+    """
+    Just a hello world to test app
+    """
     return jsonify({ 'message': 'Hello World' }), 200
 
 # -------------------------------------------------
@@ -61,6 +64,10 @@ def full_chain():
 
 @app.route('/mine/cheat', methods=['GET'])
 def mine_cheat():
+    """
+    This is here as a cheat way to make the server mine extremely fast.
+    REMOVE IN PRODUCTION
+    """
     last_block = podchain.last_block
     last_proof = last_block['proof']
     proof = podchain.proof_of_work(last_proof)
@@ -146,7 +153,7 @@ def mine():
             podchain.new_transaction('0', userKey, portion_won)
             print(f'For DONATION: Sending {portion_won} PodCoin to {userKey}')
         
-        # Achieve consensus because new block now available
+        # Achieve consensus because new block now available (push-pull)
         podchain.achieve_consensus()
 
         resp = {
@@ -169,7 +176,7 @@ def mine():
 @app.route('/transactions/new', methods=['POST'])
 def new_transaction():
     """
-    A new transaction is added
+    A new transaction is added to the current block in progress
     """
     data = request.get_json()
 
@@ -253,6 +260,7 @@ def add_wallet():
     if not check_params(required, data.keys()):
         return {'message': 'Missing values'}, 400
     
+    # Adds wallet to the blockchains public wallet section
     added = podchain.add_wallet(data['publicKey'])
     if added:
         return {'message': 'Wallet succesfully added!', 'publicKey': data['publicKey']}, 201
@@ -325,6 +333,7 @@ def add_podcast():
     if data and not check_params(required, data.keys()):
         return jsonify({'message': 'Missing values!'}), 400
 
+    # Inserts the sql into the DB
     podcast_id, date = sql.insert('Podcast', data)
 
     resp = {

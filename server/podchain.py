@@ -9,10 +9,14 @@ class PodChain(object):
         """
         Initializes the blockchain
         """
+        # Change difficulty to make blocks harder to mine
         self.difficulty = 1
+        # Initialize chain and transactions as empty until genesis block is created
         self.podchain = list()
         self.current_transactions = list()
+        # Initialize the market cap of the blocks to 1 billion
         self.wallets = {'0': 1000000000.0 }
+        # This node initially is unaware of any other node
         self.nodes = set()
         # Create the genesis block
         self.new_block(100, 1)
@@ -25,6 +29,7 @@ class PodChain(object):
         :return: <dict> New Block
         """
         # If the previous has does not exist, recreate the hash of the previous block
+        # Generate the required block info
         block = {
             'index': len(self.podchain) + 1,
             'timestamp': time(),
@@ -36,7 +41,7 @@ class PodChain(object):
 
         # Reset the current list of transactions
         self.current_transactions = []
-
+        # Add new block to blockchain
         self.podchain.append(block)
         return block
     
@@ -73,11 +78,12 @@ class PodChain(object):
         :param previous_proof: <int> The proof from the previous block
         :return: <int>
         """
-        proof = 0
-        while self.valid_solution(previous_proof, proof) is False:
-            proof += 1
+        # Cheat way to get server to check a bunch of prrofs
+        guess = 0
+        while self.valid_solution(previous_proof, guess) is False:
+            guess += 1
 
-        return proof
+        return guess
 
     def add_node(self, location) -> None:
         """
@@ -85,6 +91,7 @@ class PodChain(object):
         :param location: <str> Locatable http address of the node
         :return: None
         """
+        # Extracts the ip and port of the given node
         parsed_url = urlparse(location)
         self.nodes.add(parsed_url.netloc)
 
@@ -97,19 +104,16 @@ class PodChain(object):
         previous_block = chain[0]
         # Loop through all blocks to validate chain
         for block in chain[1:]:
-            # print("BLOCKS ->")
-            # print(previous_block)
-            # print(block)
-
             # Make sure the hash of the previous block matches
             if block['previous_hash'] != self.hash(previous_block):
                 return False
             # Check that the PoW is correctly calculated
             if not self.valid_solution(previous_block['proof'], block['proof']):
                 return False
-
+            # Make this block the new previous block
             previous_block = block
 
+        # If it passes all tests it is a valid chain
         return True
     
     def achieve_consensus(self) -> bool:
@@ -124,10 +128,10 @@ class PodChain(object):
 
         # Check chains of all other nodes
         for node in self.nodes:
-            # make a get request to receive the other nodes podchain
+            # Make a get request to receive the other nodes podchain
             response = get(f'http://{node}/chain')
 
-            # If http response is successful check chain else skip node (In case of bad node in list)
+            # If http response is successful check chain otherwise it might be a malicious node
             if response.status_code == 200:
                 length = response.json()['length']
                 chain = response.json()['chain']
@@ -141,14 +145,14 @@ class PodChain(object):
         # Return true if local chain was replaced and false otherwise
         return new_chain
 
-    def valid_solution(self, previous_proof, proof) -> bool:
+    def valid_solution(self, previous_proof, guess) -> bool:
         """
-        Checks if previous and current proof combined contain 4 leading zeroes
+        Checks if previous and current guess combined contain 4 leading zeroes
         :param previous_proof: <int> Previous Proof
         :param proof: <int> Current Guessed Proof
         :return: <bool> True if correct, False if not.
         """
-        guess = f'{previous_proof}{proof}'.encode()
+        guess = f'{previous_proof}{guess}'.encode()
         guess_hash = sha256(guess).hexdigest()
         return guess_hash[:self.difficulty] == "0" * self.difficulty
 
@@ -162,6 +166,7 @@ class PodChain(object):
         if public_key in self.wallets:
             return False
         self.wallets[public_key] = 0.0
+
         return True
 
     def get_amount(self, public_key) -> float:
