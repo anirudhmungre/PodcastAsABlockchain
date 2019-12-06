@@ -19,6 +19,7 @@
 <body>
     <nav class="nav-extended black">
         <div class="nav-wrapper">
+            <!-- LOGO -->
             <img src="images/logo.png" class="brand-logo center">
         </div>
         <div class="nav-content">
@@ -30,10 +31,12 @@
         </div>
     </nav>
 
+    <!-- ALLOWS LISTENING AND MINING -->
     <div id="listenTab" class="col s12">
         <div>
             <h3>Listen to a Podcast</h3>
             <p>Do you want to mine while listening?</p>
+            <!-- SWITCH TO DO MINING OR NOT -->
             <div class="switch">
                 <label>
                     No
@@ -43,7 +46,9 @@
                 </label>
             </div>
         </div>
+        <!-- LIST OF ALL PODCASTS UPLOADED -->
         <div id="podcasts" class="podcasts"></div>
+        <!-- DONATION CONFIRMATION -->
         <div class="modal">
             <div class="modal-content">
                 <h4>Donation</h4>
@@ -57,8 +62,10 @@
         </div>
     </div>
 
+    <!-- ALLOWS UPLOADING PODCASTS -->
     <div id="uploadTab" class="col s12">
         <h3>Upload a Podcast</h3>
+        <!-- FORM TO UPLOAD PODCAST -->
         <div id="upload" class="optionCard">
             <input id="title" placeholder="Title" required>
             <input id="posterKey" placeholder="PodCoin Wallet Public Key" required>
@@ -75,10 +82,12 @@
         </div>
     </div>
 
+    <!-- ALLOWS MANAGING CRYPTO WALLET -->
     <div id="walletTab">
         <h3>My Wallet</h3>
         <div id="wallet" class="optionCard">
             <p>Wallet Public Key: <input id="publicKey" type="text" placeholder="PodCoin Wallet Public Key"></p>
+            <!-- BUTTONS TO REFRESH AMOUNTS AND ADD NEW WALLETS -->
             <div class="row">
                 <button class="btn-large waves-effect purple col s6" onclick="refreshWallet()">Refresh</button>
                 <button class="btn-large waves-effect purple col s6" onclick="addWallet()">Add Wallet</button>
@@ -90,7 +99,6 @@
         </div>
 
     </div>
-    <!-- <script src="js/mine.js"></script> -->
     <script src="js/script.js"></script>
 </body>
 
